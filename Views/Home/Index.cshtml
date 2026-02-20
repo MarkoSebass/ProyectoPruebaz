@@ -1,8 +1,292 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Salamanncas - Valorant Agents Dashboard (Kills)";
+
+    // Datos de ejemplo (reemplaza con tu modelo / BD si quieres)
+    var agentes = new[] {
+        new { Agente = "Jett",      Rol = "Duelista",    Kills = 145, Deaths = 82,  KD = 1.77, HS = 34, Partidas = 14 },
+        new { Agente = "Reyna",     Rol = "Duelista",    Kills = 158, Deaths = 88,  KD = 1.80, HS = 38, Partidas = 15 },
+        new { Agente = "Phoenix",   Rol = "Duelista",    Kills = 118, Deaths = 96,  KD = 1.23, HS = 27, Partidas = 13 },
+        new { Agente = "Raze",      Rol = "Duelista",    Kills = 131, Deaths = 90,  KD = 1.46, HS = 31, Partidas = 14 },
+        new { Agente = "Sova",      Rol = "Iniciador",   Kills = 112, Deaths = 87,  KD = 1.29, HS = 29, Partidas = 12 },
+        new { Agente = "Killjoy",   Rol = "Centinela",   Kills = 104, Deaths = 79,  KD = 1.32, HS = 26, Partidas = 12 },
+        new { Agente = "Viper",     Rol = "Controlador", Kills = 121, Deaths = 84,  KD = 1.44, HS = 28, Partidas = 13 }
+    };
+
+    // Cálculos
+    var top = agentes.OrderByDescending(a => a.Kills).First();
+    var killsPromedio = agentes.Average(a => a.Kills);
+    var kdPromedio = agentes.Average(a => a.KD);
+    var totalKills = agentes.Sum(a => a.Kills);
+    var maxKills = agentes.Max(a => a.Kills);
+
+    // Colores por rol (Bootstrap)
+    Func<string, string> colorRol = rol =>
+        rol == "Duelista" ? "danger" :
+        rol == "Iniciador" ? "info" :
+        rol == "Centinela" ? "warning" :
+        rol == "Controlador" ? "success" : "secondary";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- =================== Bootstrap CDN (Opcional si tu Layout ya lo incluye) =================== -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    /* ==== Estilo gamer premium (adaptado a VALORANT) ==== */
+    .hero {
+        background:
+            radial-gradient(circle at 10% 10%, #ff465522, transparent 60%),
+            radial-gradient(circle at 90% 20%, #00e5ff22, transparent 60%),
+            linear-gradient(135deg, #111 0%, #1a1f2b 40%, #0d6efd 100%);
+        color: #fff;
+        border-radius: 1.25rem;
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    .hero .glow {
+        position: absolute; width: 220px; height: 220px;
+        background: radial-gradient(circle, rgba(255,255,255,.28), transparent 60%);
+        filter: blur(22px); border-radius: 50%;
+        animation: float 8s ease-in-out infinite alternate;
+    }
+    .hero .g1 { top: 10%; right: 12%; }
+    .hero .g2 { bottom: -40px; left: -20px; animation-delay: 1.2s; }
+
+    .rank-pill {
+        display: inline-flex; align-items: center; gap: .4rem;
+        padding: .3rem .7rem; border-radius: 999px;
+        background: #1e2536; color: #aad1ff; font-weight: 700;
+        border: 1px dashed #2d3a56;
+    }
+    .badge-soft {
+        background-color: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .stat-card {
+        background: #0c0f1a; border-radius: 1rem; color: #cfe7ff;
+        padding: 1.2rem; overflow: hidden; position: relative;
+        border: 1px solid rgba(255,255,255,.05); box-shadow: 0 6px 20px rgba(0,0,0,.28);
+    }
+    .stat-card .accent { position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(135deg, rgba(255,70,85,.16), rgba(13,110,253,.16)); }
+    .stat-number { font-size: 2.4rem; font-weight: 900; color: #fff; letter-spacing: -0.3px; }
+
+    .table-glass {
+        background: rgba(255,255,255,.78); backdrop-filter: blur(6px);
+        border-radius: 1rem; overflow: hidden;
+    }
+    .mini-bar { height: .6rem; border-radius: .5rem; background: #eef1f7; }
+    .mini-bar > div { height: 100%; border-radius: .5rem; background: linear-gradient(90deg, #ff4757, #0d6efd); }
+
+    .progress { height: 1rem; border-radius: 1rem; background: #e9eef7; }
+    .progress-bar { font-weight: 700; letter-spacing: .2px; }
+    .card-hover:hover { transform: translateY(-4px); transition: .25s ease; }
+</style>
+
+<div class="container py-4 py-lg-5">
+    <!-- HERO -->
+    <section class="hero mb-5">
+        <span class="glow g1"></span>
+        <span class="glow g2"></span>
+
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="rank-pill"><i class="bi bi-lightning-charge-fill"></i> Salamanncas</span>
+            <span class="badge badge-soft rounded-pill">VALORANT</span>
+            <span class="badge badge-soft rounded-pill">Comparativa de Agentes</span>
+        </div>
+
+        <h1 class="display-5 fw-bold mb-2">Dashboard de Kills – Agentes de VALORANT</h1>
+        <p class="lead mb-4">
+            Comparativa visual de <strong>kills</strong>, <strong>media de kills</strong>, <strong>K/D</strong>, <strong>headshot %</strong> y <strong>partidas</strong> para 7 agentes.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">Agente Top Kills</div>
+                    <div class="stat-number">@top.Agente</div>
+                    <div class="text-white-50">@top.Kills kills</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">Media de Kills (equipo)</div>
+                    <div class="stat-number">@killsPromedio.ToString("0")</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">K/D Promedio</div>
+                    <div class="stat-number">@kdPromedio.ToString("0.00")</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BARRAS: Kills Totales (normalizadas a max) -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-crosshair2 text-danger"></i> Kills Totales por Agente
+            </h3>
+            <div class="d-flex gap-2">
+                <span class="badge text-bg-dark"><i class="bi bi-people-fill me-1"></i> 7 agentes</span>
+                <span class="badge text-bg-primary"><i class="bi bi-bullseye me-1"></i> Kills @totalKills</span>
+            </div>
+        </div>
+
+        @foreach (var a in agentes)
+        {
+            var ancho = (int)(a.Kills * 100.0 / maxKills); // normalización a 100%
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge text-bg-@colorRol(a.Rol)">@a.Rol</span>
+                        <strong>@a.Agente</strong>
+                    </div>
+                    <span class="text-muted">@a.Kills kills</span>
+                </div>
+                <div class="progress" role="progressbar" aria-label="Kills @a.Agente" aria-valuenow="@a.Kills" aria-valuemin="0" aria-valuemax="@maxKills">
+                    <div class="progress-bar" style="width:@ancho%; background:linear-gradient(90deg,#ff4757,#0d6efd)">
+                        @a.Kills
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+
+    <!-- TARJETAS COMPARATIVAS: K/D y HS% -->
+    <section class="mb-5">
+        <div class="row g-4">
+            <!-- K/D -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm card-hover h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-up-arrow text-primary me-2"></i> K/D por Agente
+                            </h5>
+                            <span class="badge bg-primary-subtle text-primary border">Media @kdPromedio.ToString("0.00")</span>
+                        </div>
+                        @foreach (var a in agentes.OrderByDescending(x => x.KD))
+                        {
+                            var kdPct = Math.Min(100, (int)(a.KD / (agentes.Max(m => m.KD)) * 100));
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>@a.Agente</strong>
+                                        <span class="ms-2 badge text-bg-@colorRol(a.Rol)">@a.Rol</span>
+                                    </div>
+                                    <span class="text-muted">@a.KD.ToString("0.00")</span>
+                                </div>
+                                <div class="mini-bar"><div style="width:@kdPct%"></div></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- HS% -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm card-hover h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-bullseye text-danger me-2"></i> Headshot %
+                            </h5>
+                            <span class="badge bg-danger-subtle text-danger border">Tope @agentes.Max(x=>x.HS)%</span>
+                        </div>
+                        @foreach (var a in agentes.OrderByDescending(x => x.HS))
+                        {
+                            <div class="row align-items-center g-2 mb-3">
+                                <div class="col-5 col-sm-4">
+                                    <strong>@a.Agente</strong>
+                                    <span class="ms-2 badge text-bg-@colorRol(a.Rol)">@a.Rol</span>
+                                </div>
+                                <div class="col-7 col-sm-8">
+                                    <div class="mini-bar"><div style="width:@a.HS%"></div></div>
+                                    <small class="text-muted">@a.HS% HS</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- TABLA DETALLADA -->
+    <section class="mb-4">
+        <div class="table-glass shadow-sm">
+            <div class="p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h5 class="mb-0"><i class="bi bi-table text-primary me-2"></i> Detalle comparativo de agentes</h5>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge text-bg-secondary"><i class="bi bi-clipboard-data me-1"></i> Media kills @killsPromedio.ToString("0")</span>
+                    <span class="badge text-bg-dark"><i class="bi bi-sum me-1"></i> Total kills @totalKills</span>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Agente</th>
+                            <th class="text-center">Rol</th>
+                            <th class="text-center">Kills</th>
+                            <th class="text-center">Deaths</th>
+                            <th class="text-center">K/D</th>
+                            <th class="text-center">HS%</th>
+                            <th class="text-center">Partidas</th>
+                            <th class="text-center">Ranking</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var ordenados = agentes.OrderByDescending(x => x.Kills).Select((v,i) => new { v, i });
+                            foreach (var item in ordenados)
+                            {
+                                var a = item.v;
+                                var pos = item.i + 1;
+                                var color = pos == 1 ? "warning" : pos == 2 ? "info" : pos == 3 ? "primary" : "secondary";
+                        }
+                        }
+                        @foreach (var item in agentes.OrderByDescending(x => x.Kills).Select((v,i) => new { v, i }))
+                        {
+                            var a = item.v;
+                            var pos = item.i + 1;
+                            var color = pos == 1 ? "warning" : pos == 2 ? "info" : pos == 3 ? "primary" : "secondary";
+                            <tr>
+                                <td class="fw-bold">@a.Agente</td>
+                                <td class="text-center"><span class="badge text-bg-@colorRol(a.Rol)">@a.Rol</span></td>
+                                <td class="text-center"><span class="badge text-bg-primary">@a.Kills</span></td>
+                                <td class="text-center">@a.Deaths</td>
+                                <td class="text-center fw-semibold">@a.KD.ToString("0.00")</td>
+                                <td class="text-center">@a.HS%</td>
+                                <td class="text-center">@a.Partidas</td>
+                                <td class="text-center">
+                                    <span class="badge text-bg-@color"><i class="bi bi-trophy-fill me-1"></i>#@pos</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="text-center text-muted small mt-4">
+        Hecho con <i class="bi bi-bootstrap-fill text-primary"></i> Bootstrap 5 · Estilo <strong>Valorant</strong> by Salamanncas
+    </div>
 </div>
+
+<script>
+    // Tooltips (si agregas data-bs-toggle="tooltip" en elementos)
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+</script>

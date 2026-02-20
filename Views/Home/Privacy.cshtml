@@ -1,6 +1,244 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+    ViewData["Title"] = "Salamanncas - Mapas & Victorias";
 
-<p>Use this page to detail your site's privacy policy.</p>
+    // Datos de ejemplo (reemplaza con tu modelo/BD si aplica)
+    // Result: "W" = Win, "L" = Loss
+    var partidos = new[] {
+        new { Mapa = "Ascent",   Rival = "Squad Hydra",   Fecha = new DateTime(2026, 2, 10), RoundsFor = 13, RoundsAgainst = 8,  Result = "W", Url = "https://tu-url.com/match/ascent-2026-02-10" },
+        new { Mapa = "Bind",     Rival = "Team Eclipse",  Fecha = new DateTime(2026, 2, 12), RoundsFor = 9,  RoundsAgainst = 13, Result = "L", Url = "https://tu-url.com/match/bind-2026-02-12" },
+        new { Mapa = "Haven",    Rival = "Blue Ravens",   Fecha = new DateTime(2026, 2, 15), RoundsFor = 14, RoundsAgainst = 12, Result = "W", Url = "https://tu-url.com/match/haven-2026-02-15" },
+        new { Mapa = "Lotus",    Rival = "Nova Strike",   Fecha = new DateTime(2026, 2, 16), RoundsFor = 13, RoundsAgainst = 6,  Result = "W", Url = "https://tu-url.com/match/lotus-2026-02-16" },
+        new { Mapa = "Icebox",   Rival = "Crimson Foxes", Fecha = new DateTime(2026, 2, 17), RoundsFor = 11, RoundsAgainst = 13, Result = "L", Url = "https://tu-url.com/match/icebox-2026-02-17" },
+        new { Mapa = "Split",    Rival = "Orion Esports", Fecha = new DateTime(2026, 2, 18), RoundsFor = 13, RoundsAgainst = 7,  Result = "W", Url = "https://tu-url.com/match/split-2026-02-18" },
+        new { Mapa = "Sunset",   Rival = "Shadow Unit",   Fecha = new DateTime(2026, 2, 19), RoundsFor = 13, RoundsAgainst = 10, Result = "W", Url = "https://tu-url.com/match/sunset-2026-02-19" }
+    };
+
+    // KPIs
+    var totalMatches   = partidos.Length;
+    var wins           = partidos.Count(p => p.Result == "W");
+    var losses         = partidos.Count(p => p.Result == "L");
+    var wr             = wins * 100.0 / totalMatches;                              // Win Rate %
+    var roundsFor      = partidos.Sum(p => p.RoundsFor);
+    var roundsAgainst  = partidos.Sum(p => p.RoundsAgainst);
+    var rd             = roundsFor - roundsAgainst;                                 // Round Diff
+    var bestWin        = partidos.Where(p => p.Result == "W").OrderByDescending(p => p.RoundsFor - p.RoundsAgainst).FirstOrDefault();
+    var byMap = partidos
+        .GroupBy(p => p.Mapa)
+        .Select(g => new {
+            Mapa = g.Key,
+            Jugados = g.Count(),
+            Wins = g.Count(x => x.Result == "W"),
+            Loss = g.Count(x => x.Result == "L"),
+            RF = g.Sum(x => x.RoundsFor),
+            RA = g.Sum(x => x.RoundsAgainst)
+        })
+        .OrderByDescending(x => x.Wins)
+        .ToList();
+
+    // Func: colores por mapa (puedes ajustar a tu paleta)
+    Func<string, string> colorMapa = mapa =>
+        mapa == "Ascent" ? "primary" :
+        mapa == "Bind" ? "warning" :
+        mapa == "Haven" ? "success" :
+        mapa == "Lotus" ? "info" :
+        mapa == "Icebox" ? "cyan" :
+        mapa == "Split" ? "danger" :
+        mapa == "Sunset" ? "secondary" : "dark";
+
+    // Normalización para barras de rounds
+    var maxRoundsFor = partidos.Max(p => p.RoundsFor);
+}
+
+<!-- =================== Bootstrap CDN (Opcional si tu Layout ya lo incluye) =================== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    /* Hero estilo gamer */
+    .hero {
+        background:
+            radial-gradient(800px 400px at 10% 10%, #ff465522, transparent 60%),
+            radial-gradient(800px 400px at 90% 20%, #00e5ff22, transparent 60%),
+            linear-gradient(135deg, #111 0%, #1a1f2b 40%, #0d6efd 100%);
+        color: #fff;
+        border-radius: 1.25rem;
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    .hero .glow { position:absolute; width:220px; height:220px; background: radial-gradient(circle, rgba(255,255,255,.25), transparent 60%); filter: blur(22px); border-radius: 50%; animation: float 8s ease-in-out infinite alternate; }
+    .hero .g1 { top: 10%; right: 12%; }
+    .hero .g2 { bottom: -40px; left: -20px; animation-delay: 1.2s; }
+
+    .stat-card {
+        background: #0c0f1a; border-radius: 1rem; color: #cfe7ff;
+        padding: 1.2rem; overflow: hidden; position: relative;
+        border: 1px solid rgba(255,255,255,.05); box-shadow: 0 6px 20px rgba(0,0,0,.28);
+    }
+    .stat-card .accent { position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(135deg, rgba(255,70,85,.16), rgba(13,110,253,.16)); }
+    .stat-number { font-size: 2.2rem; font-weight: 900; color: #fff; letter-spacing: -0.3px; }
+
+    .table-glass {
+        background: rgba(255,255,255,.8); backdrop-filter: blur(6px);
+        border-radius: 1rem; overflow: hidden;
+    }
+    .mini-bar { height: .6rem; border-radius: .5rem; background: #eef1f7; }
+    .mini-bar > div { height: 100%; border-radius: .5rem; background: linear-gradient(90deg, #ff4757, #0d6efd); }
+
+    .progress { height: 1rem; border-radius: 1rem; background: #e9eef7; }
+    .card-hover:hover { transform: translateY(-4px); transition: .25s ease; }
+
+    /* Badge extra */
+    .badge-cyan { --bs-badge-color:#055160; --bs-badge-bg:#cff4fc; color:#055160; background-color:#cff4fc; }
+</style>
+
+<div class="container py-4 py-lg-5">
+    <!-- HERO -->
+    <section class="hero mb-5">
+        <span class="glow g1"></span>
+        <span class="glow g2"></span>
+
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge text-bg-dark"><i class="bi bi-map me-1"></i> Mapas</span>
+            <span class="badge text-bg-primary"><i class="bi bi-trophy-fill me-1"></i> Victorias</span>
+            <span class="badge text-bg-light text-dark"><i class="bi bi-link-45deg me-1"></i> Replay Links</span>
+        </div>
+
+        <h1 class="display-6 fw-bold mb-2">Salamanncas — Mapas & Victorias</h1>
+        <p class="lead mb-4">
+            Resumen de resultados por mapa y partidos recientes, con enlace directo para ver el match.
+        </p>
+
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">Partidos</div>
+                    <div class="stat-number">@totalMatches</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">Victorias</div>
+                    <div class="stat-number text-success">@wins</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">Win Rate</div>
+                    <div class="stat-number">@wr.ToString("0")%</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="accent"></div>
+                    <div class="small text-white-50">RD (Rounds Diff)</div>
+                    <div class="stat-number @(rd >= 0 ? "text-success" : "text-danger")">@rd</div>
+                </div>
+            </div>
+        </div>
+
+        @if (bestWin is not null)
+        {
+            <div class="mt-3 text-white-50">
+                <i class="bi bi-star-fill text-warning me-1"></i>
+                Mejor margen: <strong class="text-white">@bestWin.Mapa</strong> vs <strong class="text-white">@bestWin.Rival</strong>
+                (@bestWin.RoundsFor - @bestWin.RoundsAgainst) — @bestWin.Fecha:dd/MM/yyyy
+            </div>
+        }
+    </section>
+
+    <!-- RESUMEN POR MAPA -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fw-bold mb-0"><i class="bi bi-grid-1x2 text-primary"></i> Rendimiento por mapa</h3>
+        </div>
+        <div class="row g-4">
+            @foreach (var m in byMap)
+            {
+                var wrMap = m.Jugados > 0 ? (m.Wins * 100.0 / m.Jugados) : 0.0;
+                <div class="col-md-6 col-xl-4">
+                    <div class="card border-0 shadow-sm card-hover h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h5 class="card-title mb-0">
+                                    <span class="badge text-bg-@(colorMapa(m.Mapa)) me-2">@m.Mapa</span>
+                                </h5>
+                                <span class="badge text-bg-light text-dark">WR @wrMap.ToString("0")%</span>
+                            </div>
+                            <div class="d-flex gap-3 mb-2">
+                                <span class="badge text-bg-success"><i class="bi bi-trophy-fill me-1"></i>@m.Wins W</span>
+                                <span class="badge text-bg-danger"><i class="bi bi-x-circle-fill me-1"></i>@m.Loss L</span>
+                                <span class="badge text-bg-secondary"><i class="bi bi-joystick me-1"></i>@m.Jugados jugados</span>
+                            </div>
+                            <div class="mini-bar mb-2"><div style="width:@Math.Min(100,(int)wrMap)%"></div></div>
+                            <small class="text-muted">Rounds: @m.RF-@m.RA</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- LISTA DE PARTIDOS (con URL para ver el partido) -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fw-bold mb-0"><i class="bi bi-collection-play text-danger"></i> Partidos Recientes</h3>
+            <span class="badge text-bg-dark"><i class="bi bi-sum me-1"></i> Rounds @roundsFor:@roundsAgainst</span>
+        </div>
+
+        <div class="table-glass shadow-sm">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Mapa</th>
+                            <th>Rival</th>
+                            <th class="text-center">Resultado</th>
+                            <th class="text-center">Marcador</th>
+                            <th class="text-center">Ver Partido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in partidos.OrderByDescending(x => x.Fecha))
+                        {
+                            var isWin = p.Result == "W";
+                            var color = isWin ? "success" : "danger";
+                            var pct = (int)(p.RoundsFor * 100.0 / (Math.Max(p.RoundsFor, p.RoundsAgainst)));
+                            var ancho = Math.Clamp(pct, 8, 100);
+                            <tr>
+                                <td>@p.Fecha:dd/MM/yyyy</td>
+                                <td><span class="badge text-bg-@(colorMapa(p.Mapa))">@p.Mapa</span></td>
+                                <td>@p.Rival</td>
+                                <td class="text-center">
+                                    <span class="badge text-bg-@color">@p.Result</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="progress" style="height: .9rem;">
+                                        <div class="progress-bar bg-@color" style="width:@ancho%">@p.RoundsFor-@p.RoundsAgainst</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-outline-primary" href="@p.Url" target="_blank" rel="noopener">
+                                        <i class="bi bi-play-circle me-1"></i> Ver partido
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notas -->
+    <div class="text-center text-muted small mt-4">
+        Tip: reemplaza los datos de ejemplo por tu modelo desde el controlador para que se alimente de tu base de datos.
+    </div>
+</div>
