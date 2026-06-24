@@ -266,8 +266,6 @@ C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\ramucpbeob-{0}-2z0ns
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\dtj8pc9n65-{0}-muycvpuwrr-muycvpuwrr.gz
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\1ykp5jw4hc-{0}-87fc7y1x7t-87fc7y1x7t.gz
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\u4utt3cccs-{0}-mlv21k5csn-mlv21k5csn.gz
-C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\34mrl98wyp-{0}-dhmtrn2e26-dhmtrn2e26.gz
-C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\af81w0kv99-{0}-dhmtrn2e26-dhmtrn2e26.gz
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\staticwebassets.development.json
@@ -279,3 +277,6 @@ C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\refint\ProyectoPruebaz.dll
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\ProyectoPruebaz.pdb
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\ProyectoPruebaz.genruntimeconfig.cache
 C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\ref\ProyectoPruebaz.dll
+C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\ProyectoPruebaz.sourcelink.json
+C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\34mrl98wyp-{0}-hsf5tm1p91-hsf5tm1p91.gz
+C:\Users\Marko\ProyectoPruebaz\obj\Debug\net10.0\compressed\af81w0kv99-{0}-hsf5tm1p91-hsf5tm1p91.gz

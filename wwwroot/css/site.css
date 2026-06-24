@@ -1,31 +1,62 @@
+/* ===========================
+   BASE
+=========================== */
 html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
+  font-size: clamp(14px, 1.5vw, 16px); /* Tamaño fluido en lugar de media query */
   position: relative;
   min-height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
   margin-bottom: 60px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+/* ===========================
+   FOCUS RING UNIFICADO
+=========================== */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 0.1rem white,
+    0 0 0 0.25rem #258cfb;
+  transition: box-shadow 0.15s ease;
+}
+
+/* ===========================
+   CONTROLES DE FORMULARIO
+=========================== */
+.form-control {
+  background-color: var(--bs-tertiary-bg, #f8f9fa);
+  border: 0.5px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form-control:hover:not(:focus) {
+  border-color: rgba(37, 140, 251, 0.4);
+}
+
+/* ===========================
+   FORM FLOATING — PLACEHOLDER
+=========================== */
+.form-floating > .form-control::placeholder,
+.form-floating > .form-control-plaintext::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
+  opacity: 0.65;
+  transition: text-align 0.15s ease, opacity 0.15s ease;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control:focus::placeholder,
+.form-floating > .form-control-plaintext:focus::placeholder {
   text-align: start;
+  opacity: 1;
 }

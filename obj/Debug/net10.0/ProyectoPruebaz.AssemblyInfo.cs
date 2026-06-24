@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProyectoPruebaz")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b70cc95c446ca92f40ea20002cdc6bd1da2b632c")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProyectoPruebaz")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProyectoPruebaz")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
